@@ -1,3 +1,8 @@
+# Visual Studio
+.vs/
+Debug/
+Realease/
+
 # Prerequisites
 *.d
 
