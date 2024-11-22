@@ -6,6 +6,8 @@
 #define VECTOR_EXTEND (VECTOR_SIZE + 1)
 
 #include <iostream>
+#include <stdexcept>
+#include <cmath>
 
 /**
 * | 1 0 0 0 |   |x|
@@ -34,21 +36,57 @@ void imprimirVector(float* vect) {
 	}
 }
 
+void rotation(float* vect, float* vectRes, double angle, char axis) {
+	double PI = 3.14159265358979323846;
+	angle = angle * PI / 180;
+    switch (axis) {
+		// Matrices de rotacion
+    case 'x': {
+        float rotationX[16] = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, cos((float)angle), -sin((float)angle), 0.0f,
+            0.0f, sin((float)angle), cos((float)angle), 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        };
+		mulMatrixVector4x1(rotationX, vect, vectRes);
+		break;
+    }
+    case 'y': {
+        float rotationY[16] = {
+            cos((float)angle), 0.0f, sin((float)angle), 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            -sin((float)angle), 0.0f, cos((float)angle), 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        };
+		mulMatrixVector4x1(rotationY, vect, vectRes);
+		break;
+    }
+    case 'z': {
+        float rotationZ[16] = {
+            cos((float)angle), -sin((float)angle), 0.0f, 0.0f,
+            sin((float)angle), cos((float)angle), 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        };
+		mulMatrixVector4x1(rotationZ, vect, vectRes);
+		break;
+    }
+	default: {
+		std::cout << "Error: Eje de rotacion no valido" << std::endl;
+		break;
+	}
+    }
+}
+
+
 int main() {
-	// Operandos
-	float matrizIdentidad[16] = {
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f
-	};
-	float vectorExtended[4] = { 0 };
+	float vectorExtended[4] = { 0,0,0,0 };
 	float vecResultado[8] = { 0 };
 
 	// Input vector
 	cargarVector(vectorExtended, VECTOR_SIZE);
-	// PROC punto flotante
-	mulMatrixVector4x1(matrizIdentidad, vectorExtended, vecResultado);
+	// esto era un test de rotacion
+	rotation(vectorExtended, vecResultado, 90, 'x');
 	//Imprimir
 	imprimirVector(vecResultado);
 	
