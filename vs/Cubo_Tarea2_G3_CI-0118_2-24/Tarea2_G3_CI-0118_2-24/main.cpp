@@ -22,22 +22,22 @@ void cargarVector(float* vector, size_t vecSize) {
 	}
 	std::cout << " )";
 }
-// Operarar matriz por vector entre la m. de la transformaci髇 y los vertices
+// Operarar matriz por vector entre la m. de la transformaci贸n y los vertices
 void TranformarVertices(float matrizTransform[MATRIZ_SIZE], CubeUI& cubo) {
 	// Inicializa vector extendido con w = 1
 	float vector[VECTOR_EXTEND] = { (0) };
 	vector[VECTOR_SIZE] = 1;
 	float newVector[VECTOR_EXTEND] = { (0) };
-	// Itera sobre cada v閞tice del cubo
+	// Itera sobre cada v茅rtice del cubo
 	for (size_t vertice = 0; vertice < CUBE_VERTICES; ++vertice) {
-		// Copia las coordenadas (x, y, z) del v閞tice actual al vector extendido R4
+		// Copia las coordenadas (x, y, z) del v茅rtice actual al vector extendido R4
 		for (size_t index = 0; index < VECTOR_SIZE; ++index) {
 			vector[index] = cubo.getVertices()[vertice * VECTOR_SIZE + index];
 		}
 		// Multiplica la matriz de transformacion por el vector extendido
 		mulMatrixVector4x1(matrizTransform, vector, newVector);
 
-		// Actualiza las coordenadas del v閞tice tranformado en el cubo
+		// Actualiza las coordenadas del v茅rtice tranformado en el cubo
 		for (size_t index = 0; index < VECTOR_SIZE; ++index) {
 			cubo.getVertices()[vertice * VECTOR_SIZE + index] = newVector[index];
 		}
@@ -46,15 +46,15 @@ void TranformarVertices(float matrizTransform[MATRIZ_SIZE], CubeUI& cubo) {
 
 int escalarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	// Input
-	std::cout << "Opci髇 seleccionada: Escala.\n";
-	std::cout << "Seleccione una opci髇 para la escala:\n";
+	std::cout << "Opci贸n seleccionada: Escala.\n";
+	std::cout << "Seleccione una opci贸n para la escala:\n";
 	std::cout << "1. Aumentar\n";
 	std::cout << "2. Disminuir\n";
 	int scaleChoice;
 	std::cin >> scaleChoice;
 	// Validar el valor ingresado
 	if (std::cin.fail()) {
-		std::cerr << "Entrada inv醠ida para el 醤gulo. Debe ser un n鷐ero." << std::endl;
+		std::cerr << "Entrada inv谩lida para el 谩ngulo. Debe ser un n煤mero." << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -67,12 +67,12 @@ int escalarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 		scale = 0.5f;
 		break;
 	default:
-		std::cout << "Opci髇 no v醠ida. Intente nuevamente.\n";
+		std::cout << "Opci贸n no v谩lida. Intente nuevamente.\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		return EXIT_FAILURE;
 	}
 
-	// Configura la matriz de transformaci髇 para escalar los v閞tices
+	// Configura la matriz de transformaci贸n para escalar los v茅rtices
 	float matrizEscala[MATRIZ_SIZE] = { 0 };
 	float scaleFactor[VECTOR_SIZE] = { scale, scale, scale };  // Escala simetrica en todos los ejes
 	matriz.escale(matrizEscala, scaleFactor);
@@ -85,40 +85,66 @@ int rotarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	// Input
 	double angle = 0.0;
 	char axis = ' ';
-	// Solicitar el 醤gulo de rotaci髇
-	std::cout << "Ingrese el 醤gulo de rotaci髇 (en grados): ";
+	// Solicitar el 谩ngulo de rotaci贸n
+	std::cout << "Ingrese el 谩ngulo de rotaci贸n (en grados): ";
 	std::cin >> angle;
 	// Validar el valor ingresado
 	if (std::cin.fail()) {
-		std::cerr << "Entrada inv醠ida para el 醤gulo. Debe ser un n鷐ero." << std::endl;
+		std::cerr << "Entrada inv谩lida para el 谩ngulo. Debe ser un n煤mero." << std::endl;
 		return EXIT_FAILURE;
 	}
-	// Solicitar el eje de rotaci髇
-	std::cout << "Ingrese el eje de rotaci髇 (x, y, o z): ";
+	// Solicitar el eje de rotaci贸n
+	std::cout << "Ingrese el eje de rotaci贸n (x, y, o z): ";
 	std::cin >> axis;
 	if (tolower(axis) < 'x' || tolower(axis) > 'z') {
 		std::cerr << "Eje especificado invalido." << std::endl;
 		return EXIT_FAILURE;
 	}
 
-	// Configura la matriz de transformaci髇 para rotar
+	// Configura la matriz de transformaci贸n para rotar
 	float matrizRotacion[MATRIZ_SIZE] = { 0 };
 	matriz.rotation(matrizRotacion, angle, axis);
-	// Opera los vectos del cubo y la matriz de rotaci髇
+	// Opera los vectos del cubo y la matriz de rotaci贸n
 	TranformarVertices(matrizRotacion, cubo);
 
 	return EXIT_SUCCESS;
 }
 
 int TrasladarCubo(CubeUI& cubo, Matriz4x4& matriz) {
+	float scaleFactor[VECTOR_SIZE] = {0};
+float scale = 1.0f;
+float matrix[MATRIZ_SIZE] = {
+   1, 0, 0, 0,
+   0, 1, 0, 0,
+   0, 0, 1, 0,
+   0, 0, 0, 1
+};
+for (int i = 0; i < 3; i++) {
+	std::cout << "Ingresar entrada " <<i+1<<" del vector: " << std::endl;
+	std::cin >> scale;
+	scaleFactor[i] = scale;
+}
+
+
+float resultMatrix[MATRIZ_SIZE] = { 0 };
+
+translateMatrix(matrix, scaleFactor, resultMatrix);
+
+std::cout << "Matriz despues de la traslacion:" << std::endl;
+for (int i = 0; i < 4; i++) {
+	for (int j = 0; j < 4; j++) {
+		std::cout << resultMatrix[i * 4 + j] << " ";
+	}
+	std::cout << std::endl;
+}
 	return 0;
 }
 
 int menu(CubeUI& cubo, Matriz4x4& matriz) {
 	std::cout << "\n//////////////////////////////////////\n";
-	std::cout << "Seleccione una opci髇:\n";
-	std::cout << "1. Traslaci髇\n";
-	std::cout << "2. Rotaci髇\n";
+	std::cout << "Seleccione una opci贸n:\n";
+	std::cout << "1. Traslaci贸n\n";
+	std::cout << "2. Rotaci贸n\n";
 	std::cout << "3. Escala\n";
 
 	int choice;
@@ -126,7 +152,7 @@ int menu(CubeUI& cubo, Matriz4x4& matriz) {
 
 	switch (choice) {
 	case 1:
-		//handleTranslation();
+		TrasladarCubo(cubo,matriz);
 		break;
 	case 2:
 		rotarCubo(cubo, matriz);
@@ -135,7 +161,7 @@ int menu(CubeUI& cubo, Matriz4x4& matriz) {
 		escalarCubo(cubo, matriz);
 		break;
 	default:
-		std::cout << "Opci髇 no v醠ida. Intente nuevamente.\n";
+		std::cout << "Opci贸n no v谩lida. Intente nuevamente.\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		return EXIT_FAILURE;
 	}
