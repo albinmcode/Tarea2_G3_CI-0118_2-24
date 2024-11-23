@@ -13,6 +13,7 @@
 */
 
 extern "C" float* mulMatrixVector4x1(float* matrixPtr, float* vectorPtr, float* resultVectPtr);
+extern "C" void translateMatrix(float* matrixPtr, float* translationVectorPtr, float* resultMatrixPtr);
 
 void cargarVector(float* vector, size_t vecSize) {
 	std::cout << "Ingrese las entradas del vector:\n" << "( ";

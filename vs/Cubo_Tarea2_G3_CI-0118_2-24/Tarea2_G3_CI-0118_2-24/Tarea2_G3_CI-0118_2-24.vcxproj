@@ -144,6 +144,7 @@
     <MASM Include="mtrxMul.asm">
       <FileType>Document</FileType>
     </MASM>
+    <MASM Include="Rotar.asm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.hpp" />

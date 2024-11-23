@@ -29,6 +29,9 @@
     <MASM Include="mtrxMul.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="Rotar.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CubeUI.hpp">
