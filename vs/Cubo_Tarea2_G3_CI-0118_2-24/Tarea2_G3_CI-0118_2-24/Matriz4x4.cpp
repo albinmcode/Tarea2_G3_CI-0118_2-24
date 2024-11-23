@@ -5,7 +5,7 @@
 
 Matriz4x4::Matriz4x4() {}
 int Matriz4x4::Indentidad(float matriz[MATRIZ_SIZE]) {
-    if (matriz == nullptr) return 1;
+    if (matriz == nullptr) return EXIT_FAILURE;
 	for (size_t index = 0; index < MATRIZ_SIZE; ++index) {
 		matriz[index] = this->matrizIdentidad[index];
 	}
@@ -25,7 +25,7 @@ int Matriz4x4::rotation(float matriz[MATRIZ_SIZE], double angle, const char axis
     const double PI = 3.14159265358979323846;
     angle = angle * PI / 180;
     float* rotationMatrix = nullptr;
-    switch (axis) {
+    switch (tolower(axis)) {
         // Matrices de rotacion
         case 'x': {
             float rotationX[MATRIZ_SIZE] = {
@@ -59,7 +59,7 @@ int Matriz4x4::rotation(float matriz[MATRIZ_SIZE], double angle, const char axis
         }
         default: {
             std::cout << "Error: Eje de rotacion no valido" << std::endl;
-            return 1;
+            return EXIT_FAILURE;
         }      
     }
     for (size_t index = 0; index < MATRIZ_SIZE; ++index) {

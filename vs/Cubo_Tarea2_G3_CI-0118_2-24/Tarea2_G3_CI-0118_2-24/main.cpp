@@ -22,12 +22,12 @@ void cargarVector(float* vector, size_t vecSize) {
 	}
 	std::cout << " )";
 }
-
+// Operarar matriz por vector entre la m. de la transformación y los vertices
 void TranformarVertices(float matrizTransform[MATRIZ_SIZE], CubeUI& cubo) {
 	// Inicializa vector extendido con w = 1
 	float vector[VECTOR_EXTEND] = { (0) };
 	vector[VECTOR_SIZE] = 1;
-	float newVector[VECTOR_EXTEND + 1] = { (0) };
+	float newVector[VECTOR_EXTEND] = { (0) };
 	// Itera sobre cada vértice del cubo
 	for (size_t vertice = 0; vertice < CUBE_VERTICES; ++vertice) {
 		// Copia las coordenadas (x, y, z) del vértice actual al vector extendido R4
@@ -55,7 +55,7 @@ int escalarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	// Validar el valor ingresado
 	if (std::cin.fail()) {
 		std::cerr << "Entrada inválida para el ángulo. Debe ser un número." << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	float scale = 1.0f;
@@ -69,13 +69,12 @@ int escalarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	default:
 		std::cout << "Opción no válida. Intente nuevamente.\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	// Configura la matriz de transformación para escalar los vértices
 	float matrizEscala[MATRIZ_SIZE] = { 0 };
-	// Escala simetrica en todos los ejes
-	float scaleFactor[VECTOR_SIZE] = { scale, scale, scale };
+	float scaleFactor[VECTOR_SIZE] = { scale, scale, scale };  // Escala simetrica en todos los ejes
 	matriz.escale(matrizEscala, scaleFactor);
 	// Opera los vectos del cubo y la matriz de escala
 	TranformarVertices(matrizEscala, cubo);
@@ -92,19 +91,23 @@ int rotarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	// Validar el valor ingresado
 	if (std::cin.fail()) {
 		std::cerr << "Entrada inválida para el ángulo. Debe ser un número." << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 	// Solicitar el eje de rotación
 	std::cout << "Ingrese el eje de rotación (x, y, o z): ";
 	std::cin >> axis;
+	if (tolower(axis) < 'x' || tolower(axis) > 'z') {
+		std::cerr << "Eje especificado invalido." << std::endl;
+		return EXIT_FAILURE;
+	}
 
-	// Configura la matriz de transformación para escalar los vértices
+	// Configura la matriz de transformación para rotar
 	float matrizRotacion[MATRIZ_SIZE] = { 0 };
 	matriz.rotation(matrizRotacion, angle, axis);
 	// Opera los vectos del cubo y la matriz de rotación
 	TranformarVertices(matrizRotacion, cubo);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int TrasladarCubo(CubeUI& cubo, Matriz4x4& matriz) {
@@ -134,7 +137,7 @@ int menu(CubeUI& cubo, Matriz4x4& matriz) {
 	default:
 		std::cout << "Opción no válida. Intente nuevamente.\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		return 1;
+		return EXIT_FAILURE;
 	}
 	return 0;
 }

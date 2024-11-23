@@ -19,6 +19,10 @@
 
 ; Mul 4x4 matriz y 4x1 vector columna
 mulMatrixVector4x1 PROC ; (float* matrixPtr, float* vectorPtr, float* resultVectPtr)
+    push RSI
+    push RDI
+    push RBX
+
     mov RSI, 0
     mov RDI, 0
     mov BL, 0
@@ -37,8 +41,9 @@ mulMatrixVector4x1 PROC ; (float* matrixPtr, float* vectorPtr, float* resultVect
         ; guardar resultado en variable para ajustar tama?o
         vmovss resultado, xmm2
         ; guardar en entrada RDI del vector resutado 4x1
+        mov RAX, 0
         mov EAX, resultado
-        mov [R8+RDI], RAX
+        mov [R8+RDI], EAX
         ; Siguiente fila
         add RSI, 16
         ; Siguiente entrada del vector resultado
@@ -47,7 +52,13 @@ mulMatrixVector4x1 PROC ; (float* matrixPtr, float* vectorPtr, float* resultVect
         inc BL
         cmp BL, 4
         jl siguienteFila
-    ret  
+    
+    pop RBX
+    pop RDI
+    pop RSI
+    
+    ret
+    
 mulMatrixVector4x1 ENDP
 
 END
