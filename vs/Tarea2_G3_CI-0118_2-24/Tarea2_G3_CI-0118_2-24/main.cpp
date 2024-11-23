@@ -36,6 +36,16 @@ void imprimirVector(float* vect) {
 	}
 }
 
+int scale(float vect[VECTOR_SIZE], float vectRes[VECTOR_EXTEND],const float vectorScale[VECTOR_SIZE]) {
+	float matriz[16] = {0};
+	// diagonal de la matriz identidad = escala
+	matriz[0] = vectorScale[0];
+	matriz[1 * VECTOR_EXTEND + 1] = vectorScale[1];
+	matriz[2 * VECTOR_EXTEND + 2] = vectorScale[2];
+	mulMatrixVector4x1(matriz, vect, vectRes);
+	return 0;
+}
+
 void rotation(float* vect, float* vectRes, double angle, char axis) {
 	double PI = 3.14159265358979323846;
 	angle = angle * PI / 180;
@@ -81,7 +91,7 @@ void rotation(float* vect, float* vectRes, double angle, char axis) {
 
 int main() {
 	float vectorExtended[4] = { 0,0,0,0 };
-	float vecResultado[8] = { 0 };
+	float vecResultado[4] = { 0 };
 
 	// Input vector
 	cargarVector(vectorExtended, VECTOR_SIZE);
@@ -89,6 +99,12 @@ int main() {
 	rotation(vectorExtended, vecResultado, 90, 'x');
 	//Imprimir
 	imprimirVector(vecResultado);
-	
+
+	// esto era un test de escala
+	std::cout << "\nEscala:\n";
+	float scaleVector[VECTOR_SIZE] = { 2, 2, 2 };
+	scale(vectorExtended, vecResultado, scaleVector);
+	//Imprimir
+	imprimirVector(vecResultado);
 	return 0;
 }
