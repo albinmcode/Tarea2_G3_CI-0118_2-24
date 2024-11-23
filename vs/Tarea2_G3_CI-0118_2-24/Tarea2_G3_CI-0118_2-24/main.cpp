@@ -18,6 +18,7 @@
 */
 
 extern "C" float* mulMatrixVector4x1(float* matrixPtr, float* vectorPtr, float* resultVectPtr);
+extern "C" void translateMatrix(float* matrixPtr, float* translationVectorPtr, float* resultMatrixPtr);
 
 void cargarVector(float* vector, size_t vecSize) {
 	std::cout << "Ingrese las entradas del vector:\n" << "( ";
@@ -99,6 +100,27 @@ int main() {
 	rotation(vectorExtended, vecResultado, 90, 'x');
 	//Imprimir
 	imprimirVector(vecResultado);
+
+	//Metodo de traslacion
+
+	float matrix[16] = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	};
+
+	float resultMatrix[16] = { 0 };
+	translateMatrix(matrix, vectorExtended,resultMatrix);
+
+	std::cout << "Matriz despues de la traslacion:" << std::endl;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			std::cout << resultMatrix[i * 4 + j] << " ";
+		}
+		std::cout << std::endl;
+	}
+	
 
 	// esto era un test de escala
 	std::cout << "\nEscala:\n";
