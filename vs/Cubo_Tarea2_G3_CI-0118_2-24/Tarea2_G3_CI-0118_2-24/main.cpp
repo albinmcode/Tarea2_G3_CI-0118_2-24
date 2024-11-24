@@ -14,6 +14,7 @@
 
 extern "C" {
 	void mulMatrixVector4x1(float* matrix4x4Ptr, float* vector4x1Ptr, float* resultVect4x1Ptr);
+	void mulMatrix4x4(float* matrixAPtr, float* matrixBPtr, float* resMatrix4x4);
 	void translateMatrix(float* matrix4x4Ptr, float* translationVector3x1Ptr, float* resultMatrix4x4Ptr);
 	void scaleMatrix(float* matrix4x4Ptr, float* scaleVector3x1Ptr, float* resultMatrix4x4Ptr);
 }
@@ -26,6 +27,16 @@ void cargarVector(float* vector, size_t vecSize) {
 	}
 	std::cout << " )";
 }
+
+void imprimirVector(float* vect, size_t vectSize) {
+	std::cout << std::endl << "Vector resultante: [";
+	std::cout << std::fixed;
+	std::cout.precision(1);	// precision de 3 decimales
+	for (size_t index = 0; index < vectSize; index++) {
+		std::cout << vect[index] << ((index == vectSize - 1) ? "]\n" : ", ");
+	}
+}
+
 // Operarar matriz por vector entre la m. de la transformación y los vertices
 void TranformarVertices(float matrizTransform[MATRIZ_SIZE], CubeUI& cubo) {
 	// Inicializa vector extendido con w = 1
@@ -132,12 +143,40 @@ int trasladarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	return 0;
 }
 
+int componerTransf(CubeUI& cubo, Matriz4x4& matriz) {
+	float A[MATRIZ_SIZE] = {
+		1.0f, 2.0f, 3.0f, 4.0f,
+		5.0f, 6.0f, 7.0f, 8.0f,
+		9.0f, 10.0f, 11.0f, 12.0f,
+		13.0f, 14.0f, 15.0f, 16.0f
+	};
+	float B[MATRIZ_SIZE] = {
+		16.0f, 15.0f, 14.0f, 13.0f,
+		12.0f, 11.0f, 10.0f, 9.0f,
+		8.0f, 7.0f, 6.0f, 5.0f,
+		4.0f, 3.0f, 2.0f, 1.0f
+	};
+	float res[MATRIZ_SIZE] = { 0 };
+
+	mulMatrix4x4(A, B, res);
+	for (int i = 0; i < VECTOR_EXTEND; i++) {
+		for (int j = 0; j < VECTOR_EXTEND; j++) {
+			std::cout << res[i * 4 + j] << " ";
+		}
+		std::cout << std::endl;
+	}
+
+	return 0;
+}
+
 int menu(CubeUI& cubo, Matriz4x4& matriz) {
-	std::cout << "\n//////////////////////////////////////\n";
-	std::cout << "Seleccione una opcion:\n";
-	std::cout << "1. Traslacion\n";
-	std::cout << "2. Rotacion\n";
-	std::cout << "3. Escala\n";
+	std::cout << "\n//////////////////////////////////////\n"
+	<< "Seleccione una opcion:\n"
+	<< "1. Traslacion\n"
+	<< "2. Rotacion\n"
+	<< "3. Escala\n"
+	<< "4. Composicion\n";
+
 
 	int choice;
 	std::cin >> choice;
@@ -152,6 +191,9 @@ int menu(CubeUI& cubo, Matriz4x4& matriz) {
 	case 3:
 		escalarCubo(cubo, matriz);
 		break;
+	case 4:
+		componerTransf(cubo, matriz);
+		break;
 	default:
 		std::cout << "Opcion no válida. Intente nuevamente.\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -159,15 +201,6 @@ int menu(CubeUI& cubo, Matriz4x4& matriz) {
 	}
 	std::cout << "//////////////////////////////////////\n";
 	return 0;
-}
-
-void imprimirVector(float* vect) {
-	std::cout << std::endl << "Vector resultante: [";
-	std::cout << std::fixed;
-	std::cout.precision(1);	// precision de 3 decimales
-	for (int index = 0; index < VECTOR_EXTEND; index++) {
-		std::cout << vect[index] << ((index == VECTOR_EXTEND - 1) ? "]\n" : ", ");
-	}
 }
 
 int main() {
@@ -180,5 +213,7 @@ int main() {
 		std::cin.clear();
 	}
 	
+
+
 	return 0;
 }
