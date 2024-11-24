@@ -27,23 +27,20 @@ mulMatrixVector4x1 PROC ; (float* matrixPtr, float* vectorPtr, float* resultVect
     mov RDI, 0
     mov BL, 0
     siguienteFila:
-        vmovups ymm0, ymmword ptr [RCX+RSI] ;Carga fila RSI 
-        vmovups ymm1, ymmword ptr [RDX] ;Carga el vector
+        movups xmm0, xmmword ptr [RCX+RSI] ;Carga fila RSI 
+        movups xmm1, xmmword ptr [RDX] ;Carga el vector
     
-    mulRowVector: ; producto punto entre fila ymm0[RSI] y vector ymm1
+        mulRowVector: ; producto punto entre fila xmm0[RSI] y vector xmm1
         ; Multiplica fila * vector
-        vmulps ymm2, ymm0, ymm1
-        ; Suma todas las entradas del producto en ymm2
-        vperm2f128 ymm1, ymm2, ymm2, 1       ; Mueve los 128 bits superiores de ymm2 a ymm1
-        vaddps ymm0, ymm0, ymm1              ; Suma los 128 bits superiores e inferiores de ymm0
-        vhaddps ymm2, ymm2, ymm2             ; Suma horizontalmente los pares de elementos
-        vhaddps ymm2, ymm2, ymm2             ; Suma horizontalmente nuevamente
-        ; guardar resultado en variable para ajustar tama?o
-        vmovss resultado, xmm2
+        vmulps xmm2, xmm0, xmm1
+        ;; Suma todas las entradas del producto en xmm2 = [a, b, c, d] 
+        vshufps xmm1, xmm2, xmm2, 238 ; [c, d, a, b]
+        vaddps xmm2, xmm2, xmm1      ; [a+c, b+d, a+c, b+d]
+        vshufps xmm1, xmm2, xmm2, 1 ; [b+d, a+c, b+d, a+c]
+        vaddps xmm2, xmm2, xmm1    ; [a+b+c+d,...]
+        
         ; guardar en entrada RDI del vector resutado 4x1
-        mov RAX, 0
-        mov EAX, resultado
-        mov [R8+RDI], EAX
+        movss dword ptr [R8+RDI], xmm2
         ; Siguiente fila
         add RSI, 16
         ; Siguiente entrada del vector resultado

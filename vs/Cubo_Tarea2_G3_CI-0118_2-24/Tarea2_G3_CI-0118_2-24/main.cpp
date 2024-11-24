@@ -12,8 +12,11 @@
 * 
 */
 
-extern "C" float* mulMatrixVector4x1(float* matrixPtr, float* vectorPtr, float* resultVectPtr);
-extern "C" void translateMatrix(float* matrixPtr, float* translationVectorPtr, float* resultMatrixPtr);
+extern "C" {
+	void mulMatrixVector4x1(float* matrix4x4Ptr, float* vector4x1Ptr, float* resultVect4x1Ptr);
+	void translateMatrix(float* matrix4x4Ptr, float* translationVector3x1Ptr, float* resultMatrix4x4Ptr);
+	void scaleMatrix(float* matrix4x4Ptr, float* scaleVector3x1Ptr, float* resultMatrix4x4Ptr);
+}
 
 void cargarVector(float* vector, size_t vecSize) {
 	std::cout << "Ingrese las entradas del vector:\n" << "( ";
@@ -47,8 +50,8 @@ void TranformarVertices(float matrizTransform[MATRIZ_SIZE], CubeUI& cubo) {
 
 int escalarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	// Input
-	std::cout << "Opción seleccionada: Escala.\n";
-	std::cout << "Seleccione una opción para la escala:\n";
+	std::cout << "Opcion seleccionada: Escala.\n";
+	std::cout << "Seleccione una opcion para la escala:\n";
 	std::cout << "1. Aumentar\n";
 	std::cout << "2. Disminuir\n";
 	int scaleChoice;
@@ -68,15 +71,16 @@ int escalarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 		scale = 0.5f;
 		break;
 	default:
-		std::cout << "Opción no válida. Intente nuevamente.\n";
+		std::cout << "Opcion no válida. Intente nuevamente.\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		return EXIT_FAILURE;
 	}
 
 	// Configura la matriz de transformación para escalar los vértices
-	float matrizEscala[MATRIZ_SIZE] = { 0 };
+	float matrizEscala[MATRIZ_SIZE] = {0};
 	float scaleFactor[VECTOR_SIZE] = { scale, scale, scale };  // Escala simetrica en todos los ejes
-	matriz.escale(matrizEscala, scaleFactor);
+	scaleMatrix(matrizEscala, scaleFactor, matrizEscala);
+	
 	// Opera los vectos del cubo y la matriz de escala
 	TranformarVertices(matrizEscala, cubo);
 	return 0;
@@ -87,7 +91,7 @@ int rotarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	double angle = 0.0;
 	char axis = ' ';
 	// Solicitar el ángulo de rotación
-	std::cout << "Ingrese el ángulo de rotación (en grados): ";
+	std::cout << "Ingrese el ángulo de rotacion (en grados): ";
 	std::cin >> angle;
 	// Validar el valor ingresado
 	if (std::cin.fail()) {
@@ -95,7 +99,7 @@ int rotarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 		return EXIT_FAILURE;
 	}
 	// Solicitar el eje de rotación
-	std::cout << "Ingrese el eje de rotación (x, y, o z): ";
+	std::cout << "Ingrese el eje de rotacion (x, y, o z): ";
 	std::cin >> axis;
 	if (tolower(axis) < 'x' || tolower(axis) > 'z') {
 		std::cerr << "Eje especificado invalido." << std::endl;
@@ -111,41 +115,28 @@ int rotarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	return EXIT_SUCCESS;
 }
 
-int TrasladarCubo(CubeUI& cubo, Matriz4x4& matriz) {
-	float scaleFactor[VECTOR_SIZE] = {0};
-float scale = 1.0f;
-float matrix[MATRIZ_SIZE] = {
-   1, 0, 0, 0,
-   0, 1, 0, 0,
-   0, 0, 1, 0,
-   0, 0, 0, 1
-};
-for (int i = 0; i < 3; i++) {
-	std::cout << "Ingresar entrada " <<i+1<<" del vector: " << std::endl;
-	std::cin >> scale;
-	scaleFactor[i] = scale;
-}
-
-
-float resultMatrix[MATRIZ_SIZE] = { 0 };
-
-translateMatrix(matrix, scaleFactor, resultMatrix);
-
-std::cout << "Matriz despues de la traslacion:" << std::endl;
-for (int i = 0; i < 4; i++) {
-	for (int j = 0; j < 4; j++) {
-		std::cout << resultMatrix[i * 4 + j] << " ";
+int trasladarCubo(CubeUI& cubo, Matriz4x4& matriz) {
+	float traslationVec[VECTOR_SIZE] = {0};
+	float matrix[MATRIZ_SIZE] = { 0 };
+	// Input
+	matriz.Indentidad(matrix);
+	for (int i = 0; i < 3; i++) {
+		std::cout << "Traslacion en " << static_cast<char>('x' + i) << ": ";
+		std::cin >> traslationVec[i];
 	}
-	std::cout << std::endl;
-}
+	// Configura la matriz de transformación para trasladar
+	translateMatrix(matrix, traslationVec, matrix);
+	// Opera los vectos del cubo y la matriz de traslación
+	TranformarVertices(matrix, cubo);
+
 	return 0;
 }
 
 int menu(CubeUI& cubo, Matriz4x4& matriz) {
 	std::cout << "\n//////////////////////////////////////\n";
-	std::cout << "Seleccione una opción:\n";
-	std::cout << "1. Traslación\n";
-	std::cout << "2. Rotación\n";
+	std::cout << "Seleccione una opcion:\n";
+	std::cout << "1. Traslacion\n";
+	std::cout << "2. Rotacion\n";
 	std::cout << "3. Escala\n";
 
 	int choice;
@@ -153,7 +144,7 @@ int menu(CubeUI& cubo, Matriz4x4& matriz) {
 
 	switch (choice) {
 	case 1:
-		TrasladarCubo(cubo,matriz);
+		trasladarCubo(cubo,matriz);
 		break;
 	case 2:
 		rotarCubo(cubo, matriz);
@@ -162,10 +153,11 @@ int menu(CubeUI& cubo, Matriz4x4& matriz) {
 		escalarCubo(cubo, matriz);
 		break;
 	default:
-		std::cout << "Opción no válida. Intente nuevamente.\n";
+		std::cout << "Opcion no válida. Intente nuevamente.\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		return EXIT_FAILURE;
 	}
+	std::cout << "//////////////////////////////////////\n";
 	return 0;
 }
 

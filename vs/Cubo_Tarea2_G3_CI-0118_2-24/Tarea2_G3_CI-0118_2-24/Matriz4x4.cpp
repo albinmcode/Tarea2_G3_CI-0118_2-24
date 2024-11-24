@@ -12,15 +12,6 @@ int Matriz4x4::Indentidad(float matriz[MATRIZ_SIZE]) {
     return 0;
 }
 
-int Matriz4x4::escale(float matriz[MATRIZ_SIZE], const float vectorScale[VECTOR_SIZE]) {
-	this->Indentidad(matriz);
-	// diagonal de la matriz identidad = escala
-	matriz[0] = vectorScale[0];
-	matriz[1 * VECTOR_EXTEND + 1] = vectorScale[1];
-	matriz[2 * VECTOR_EXTEND + 2] = vectorScale[2];
-    return 0;
-}
-
 int Matriz4x4::rotation(float matriz[MATRIZ_SIZE], double angle, const char axis) {
     const double PI = 3.14159265358979323846;
     angle = angle * PI / 180;
