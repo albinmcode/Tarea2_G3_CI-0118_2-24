@@ -29,7 +29,7 @@
     <MASM Include="mtrxMul.asm">
       <Filter>Source Files</Filter>
     </MASM>
-    <MASM Include="Rotar.asm">
+    <MASM Include="matrizT.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
