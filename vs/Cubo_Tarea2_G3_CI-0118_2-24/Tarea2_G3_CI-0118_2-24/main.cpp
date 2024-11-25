@@ -143,29 +143,102 @@ int trasladarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	return 0;
 }
 
-int componerTransf(CubeUI& cubo, Matriz4x4& matriz) {
-	float A[MATRIZ_SIZE] = {
-		1.0f, 2.0f, 3.0f, 4.0f,
-		5.0f, 6.0f, 7.0f, 8.0f,
-		9.0f, 10.0f, 11.0f, 12.0f,
-		13.0f, 14.0f, 15.0f, 16.0f
-	};
-	float B[MATRIZ_SIZE] = {
-		16.0f, 15.0f, 14.0f, 13.0f,
-		12.0f, 11.0f, 10.0f, 9.0f,
-		8.0f, 7.0f, 6.0f, 5.0f,
-		4.0f, 3.0f, 2.0f, 1.0f
-	};
-	float res[MATRIZ_SIZE] = { 0 };
-
-	mulMatrix4x4(A, B, res);
-	for (int i = 0; i < VECTOR_EXTEND; i++) {
-		for (int j = 0; j < VECTOR_EXTEND; j++) {
-			std::cout << res[i * 4 + j] << " ";
+int componerTransf(float* resultMatrix) {
+	float compositionM[MATRIZ_SIZE] = {
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1 };
+	float matriz[MATRIZ_SIZE] = { 0 };
+	// Input (pedir las composiciones que se desea hacer, entiendase con 1,2)
+	std::cout << "Ingrese las composiciones que desea hacer (1,2,3): ";
+	int comp1, comp2 = 0;
+	std::cin >> comp1;
+	std::cin >> comp2;
+	if (comp1 == 1 || comp2 == 1) {
+		// Input
+		std::cout << "Opcion seleccionada: Escala.\n";
+		std::cout << "Seleccione una opcion para la escala:\n";
+		std::cout << "1. Aumentar\n";
+		std::cout << "2. Disminuir\n";
+		int scaleChoice;
+		std::cin >> scaleChoice;
+		// Validar el valor ingresado
+		if (std::cin.fail()) {
+			std::cerr << "Entrada inválida para el ángulo. Debe ser un número." << std::endl;
+			return EXIT_FAILURE;
 		}
-		std::cout << std::endl;
+
+		float scale = 1.0f;
+		switch (scaleChoice) {
+		case 1:
+			scale = 2.0f;
+			break;
+		case 2:
+			scale = 0.5f;
+			break;
+		default:
+			std::cout << "Opcion no válida. Intente nuevamente.\n";
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			return EXIT_FAILURE;
+		}
+
+		// Configura la matriz de transformación para escalar los vértices
+		float matrizEscala[MATRIZ_SIZE] = { 0 };
+		float scaleFactor[VECTOR_SIZE] = { scale, scale, scale };  // Escala simetrica en todos los ejes
+		scaleMatrix(matrizEscala, scaleFactor, matriz);
+		mulMatrix4x4(matriz, compositionM, compositionM);
+	}
+	if (comp1 == 2 || comp2 == 2) {
+		// Input
+		Matriz4x4 rotationM;
+		double angle = 0.0;
+		char axis = ' ';
+		// Solicitar el ángulo de rotación
+		std::cout << "Ingrese el ángulo de rotacion (en grados): ";
+		std::cin >> angle;
+		// Validar el valor ingresado
+		if (std::cin.fail()) {
+			std::cerr << "Entrada inválida para el ángulo. Debe ser un número." << std::endl;
+			return EXIT_FAILURE;
+		}
+		// Solicitar el eje de rotación
+		std::cout << "Ingrese el eje de rotacion (x, y, o z): ";
+		std::cin >> axis;
+		if (tolower(axis) < 'x' || tolower(axis) > 'z') {
+			std::cerr << "Eje especificado invalido." << std::endl;
+			return EXIT_FAILURE;
+		}
+
+		// Configura la matriz de transformación para rotar
+		float matrizRotacion[MATRIZ_SIZE] = { 0 };
+		rotationM.rotation(matrizRotacion, angle, axis);
+		mulMatrix4x4(matrizRotacion, compositionM, compositionM);
+	}
+	if (comp1 == 3 || comp2 == 3) {
+		float traslationVec[VECTOR_SIZE] = { 0 };
+		float matrix[MATRIZ_SIZE] = { 0 };
+		// Input
+		Matriz4x4 traslationM;
+		traslationM.Indentidad(matrix);
+		for (int i = 0; i < 3; i++) {
+			std::cout << "Traslacion en " << static_cast<char>('x' + i) << ": ";
+			std::cin >> traslationVec[i];
+		}
+		// Configura la matriz de transformación para trasladar
+		translateMatrix(matrix, traslationVec, matrix);
+		mulMatrix4x4(matrix, compositionM, compositionM);
+	}
+	// Copiar la matriz resultante a la matriz de composición
+	for (size_t index = 0; index < MATRIZ_SIZE; ++index) {
+		resultMatrix[index] = compositionM[index];
 	}
 
+	// Imprimir la matriz resultante
+	std::cout << "Matriz resultante: \n";
+	for (size_t index = 0; index < MATRIZ_SIZE; ++index) {
+		std::cout << compositionM[index] << ((index % 4 == 3) ? "\n" : " ");
+	}
 	return 0;
 }
 
@@ -179,6 +252,11 @@ int menu(CubeUI& cubo, Matriz4x4& matriz) {
 
 
 	int choice;
+	float identidad[MATRIZ_SIZE] = {
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1 };
 	std::cin >> choice;
 
 	switch (choice) {
@@ -192,7 +270,7 @@ int menu(CubeUI& cubo, Matriz4x4& matriz) {
 		escalarCubo(cubo, matriz);
 		break;
 	case 4:
-		componerTransf(cubo, matriz);
+		componerTransf(identidad);
 		break;
 	default:
 		std::cout << "Opcion no válida. Intente nuevamente.\n";
