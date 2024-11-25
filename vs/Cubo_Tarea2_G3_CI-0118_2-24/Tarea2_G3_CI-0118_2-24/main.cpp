@@ -19,24 +19,6 @@ extern "C" {
 	void scaleMatrix(float* matrix4x4Ptr, float* scaleVector3x1Ptr, float* resultMatrix4x4Ptr);
 }
 
-void cargarVector(float* vector, size_t vecSize) {
-	std::cout << "Ingrese las entradas del vector:\n" << "( ";
-	for (size_t index = 0; index < vecSize; ++index) {
-		std::cin >> vector[index];
-		// std::cout << ((index == vecSize - 1) ? "   )\n" : "  ");
-	}
-	std::cout << " )";
-}
-
-void imprimirVector(float* vect, size_t vectSize) {
-	std::cout << std::endl << "Vector resultante: [";
-	std::cout << std::fixed;
-	std::cout.precision(1);	// precision de 3 decimales
-	for (size_t index = 0; index < vectSize; index++) {
-		std::cout << vect[index] << ((index == vectSize - 1) ? "]\n" : ", ");
-	}
-}
-
 // Operarar matriz por vector entre la m. de la transformación y los vertices
 void TranformarVertices(float matrizTransform[MATRIZ_SIZE], CubeUI& cubo) {
 	// Inicializa vector extendido con w = 1
@@ -59,7 +41,7 @@ void TranformarVertices(float matrizTransform[MATRIZ_SIZE], CubeUI& cubo) {
 	}
 }
 
-int escalarCubo(CubeUI& cubo, Matriz4x4& matriz) {
+int escala(float* matrizEscala) {
 	// Input
 	std::cout << "Opcion seleccionada: Escala.\n";
 	std::cout << "Seleccione una opcion para la escala:\n";
@@ -69,7 +51,7 @@ int escalarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	std::cin >> scaleChoice;
 	// Validar el valor ingresado
 	if (std::cin.fail()) {
-		std::cerr << "Entrada inválida para el ángulo. Debe ser un número." << std::endl;
+		std::cerr << "Entrada invalida para el angulo. Debe ser un número." << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -82,31 +64,28 @@ int escalarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 		scale = 0.5f;
 		break;
 	default:
-		std::cout << "Opcion no válida. Intente nuevamente.\n";
+		std::cout << "Opcion no valida. Intente nuevamente.\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		return EXIT_FAILURE;
 	}
 
 	// Configura la matriz de transformación para escalar los vértices
-	float matrizEscala[MATRIZ_SIZE] = {0};
 	float scaleFactor[VECTOR_SIZE] = { scale, scale, scale };  // Escala simetrica en todos los ejes
 	scaleMatrix(matrizEscala, scaleFactor, matrizEscala);
 	
-	// Opera los vectos del cubo y la matriz de escala
-	TranformarVertices(matrizEscala, cubo);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
-int rotarCubo(CubeUI& cubo, Matriz4x4& matriz) {
+int rotacion(float* matrizRotacion, Matriz4x4& generatriz) {
 	// Input
 	double angle = 0.0;
 	char axis = ' ';
 	// Solicitar el ángulo de rotación
-	std::cout << "Ingrese el ángulo de rotacion (en grados): ";
+	std::cout << "Ingrese el angulo de rotacion (en grados): ";
 	std::cin >> angle;
 	// Validar el valor ingresado
 	if (std::cin.fail()) {
-		std::cerr << "Entrada inválida para el ángulo. Debe ser un número." << std::endl;
+		std::cerr << "Entrada invalida para el angulo. Debe ser un número." << std::endl;
 		return EXIT_FAILURE;
 	}
 	// Solicitar el eje de rotación
@@ -118,180 +97,109 @@ int rotarCubo(CubeUI& cubo, Matriz4x4& matriz) {
 	}
 
 	// Configura la matriz de transformación para rotar
-	float matrizRotacion[MATRIZ_SIZE] = { 0 };
-	matriz.rotation(matrizRotacion, angle, axis);
-	// Opera los vectos del cubo y la matriz de rotación
-	TranformarVertices(matrizRotacion, cubo);
+	generatriz.rotation(matrizRotacion, angle, axis);
 
 	return EXIT_SUCCESS;
 }
 
-int trasladarCubo(CubeUI& cubo, Matriz4x4& matriz) {
+int traslacion(float* matrizTraslacion) {
 	float traslationVec[VECTOR_SIZE] = {0};
-	float matrix[MATRIZ_SIZE] = { 0 };
 	// Input
-	matriz.Indentidad(matrix);
 	for (int i = 0; i < 3; i++) {
 		std::cout << "Traslacion en " << static_cast<char>('x' + i) << ": ";
 		std::cin >> traslationVec[i];
 	}
 	// Configura la matriz de transformación para trasladar
-	translateMatrix(matrix, traslationVec, matrix);
-	// Opera los vectos del cubo y la matriz de traslación
-	TranformarVertices(matrix, cubo);
+	translateMatrix(matrizTraslacion, traslationVec, matrizTraslacion);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
-int componerTransf(float* resultMatrix) {
-	float compositionM[MATRIZ_SIZE] = {
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1 };
-	float matriz[MATRIZ_SIZE] = { 0 };
+int componerTransf(float* matrizComp, Matriz4x4& generatriz) {
+	generatriz.Indentidad(matrizComp);
 	// Input (pedir las composiciones que se desea hacer, entiendase con 1,2)
-	std::cout << "Ingrese las composiciones que desea hacer (1,2,3): ";
+	std::cout << "Ingrese las 2 composiciones que desea hacer (1,2,3): ";
 	int comp1, comp2 = 0;
 	std::cin >> comp1;
 	std::cin >> comp2;
+
+	// Escala
 	if (comp1 == 1 || comp2 == 1) {
-		// Input
-		std::cout << "Opcion seleccionada: Escala.\n";
-		std::cout << "Seleccione una opcion para la escala:\n";
-		std::cout << "1. Aumentar\n";
-		std::cout << "2. Disminuir\n";
-		int scaleChoice;
-		std::cin >> scaleChoice;
-		// Validar el valor ingresado
-		if (std::cin.fail()) {
-			std::cerr << "Entrada inválida para el ángulo. Debe ser un número." << std::endl;
-			return EXIT_FAILURE;
-		}
-
-		float scale = 1.0f;
-		switch (scaleChoice) {
-		case 1:
-			scale = 2.0f;
-			break;
-		case 2:
-			scale = 0.5f;
-			break;
-		default:
-			std::cout << "Opcion no válida. Intente nuevamente.\n";
-			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-			return EXIT_FAILURE;
-		}
-
-		// Configura la matriz de transformación para escalar los vértices
+		// Obtener matriz
 		float matrizEscala[MATRIZ_SIZE] = { 0 };
-		float scaleFactor[VECTOR_SIZE] = { scale, scale, scale };  // Escala simetrica en todos los ejes
-		scaleMatrix(matrizEscala, scaleFactor, matriz);
-		mulMatrix4x4(matriz, compositionM, compositionM);
+		if (escala(matrizEscala) == EXIT_FAILURE) return EXIT_FAILURE;
+		// Multiplicacion de la composición y escala
+		mulMatrix4x4(matrizComp, matrizEscala, matrizComp);
 	}
+	// Rotación
 	if (comp1 == 2 || comp2 == 2) {
-		// Input
-		Matriz4x4 rotationM;
-		double angle = 0.0;
-		char axis = ' ';
-		// Solicitar el ángulo de rotación
-		std::cout << "Ingrese el ángulo de rotacion (en grados): ";
-		std::cin >> angle;
-		// Validar el valor ingresado
-		if (std::cin.fail()) {
-			std::cerr << "Entrada inválida para el ángulo. Debe ser un número." << std::endl;
-			return EXIT_FAILURE;
-		}
-		// Solicitar el eje de rotación
-		std::cout << "Ingrese el eje de rotacion (x, y, o z): ";
-		std::cin >> axis;
-		if (tolower(axis) < 'x' || tolower(axis) > 'z') {
-			std::cerr << "Eje especificado invalido." << std::endl;
-			return EXIT_FAILURE;
-		}
-
-		// Configura la matriz de transformación para rotar
+		// Obtener matriz
 		float matrizRotacion[MATRIZ_SIZE] = { 0 };
-		rotationM.rotation(matrizRotacion, angle, axis);
-		mulMatrix4x4(matrizRotacion, compositionM, compositionM);
+		if (rotacion(matrizRotacion, generatriz) == EXIT_FAILURE) return EXIT_FAILURE;
+		// Multiplicacion de la composición y rotacion
+		mulMatrix4x4(matrizComp, matrizRotacion, matrizComp);
 	}
+	// Traslación
 	if (comp1 == 3 || comp2 == 3) {
-		float traslationVec[VECTOR_SIZE] = { 0 };
-		float matrix[MATRIZ_SIZE] = { 0 };
-		// Input
-		Matriz4x4 traslationM;
-		traslationM.Indentidad(matrix);
-		for (int i = 0; i < 3; i++) {
-			std::cout << "Traslacion en " << static_cast<char>('x' + i) << ": ";
-			std::cin >> traslationVec[i];
-		}
-		// Configura la matriz de transformación para trasladar
-		translateMatrix(matrix, traslationVec, matrix);
-		mulMatrix4x4(matrix, compositionM, compositionM);
-	}
-	// Copiar la matriz resultante a la matriz de composición
-	for (size_t index = 0; index < MATRIZ_SIZE; ++index) {
-		resultMatrix[index] = compositionM[index];
+		// Obtener matriz
+		float matrizTraslacion[MATRIZ_SIZE] = { 0 };
+		generatriz.Indentidad(matrizTraslacion);
+		if (traslacion(matrizTraslacion) == EXIT_FAILURE) return EXIT_FAILURE;
+		// Multiplicacion de la composición y traslacion
+		mulMatrix4x4(matrizComp, matrizTraslacion, matrizComp);
 	}
 
-	// Imprimir la matriz resultante
-	std::cout << "Matriz resultante: \n";
-	for (size_t index = 0; index < MATRIZ_SIZE; ++index) {
-		std::cout << compositionM[index] << ((index % 4 == 3) ? "\n" : " ");
-	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
-int menu(CubeUI& cubo, Matriz4x4& matriz) {
+int menu(CubeUI& cubo, Matriz4x4& generatriz) {
 	std::cout << "\n//////////////////////////////////////\n"
-	<< "Seleccione una opcion:\n"
-	<< "1. Traslacion\n"
-	<< "2. Rotacion\n"
-	<< "3. Escala\n"
-	<< "4. Composicion\n";
-
+		<< "Seleccione una opcion:\n"
+		<< "1. Traslacion\n"
+		<< "2. Rotacion\n"
+		<< "3. Escala\n"
+		<< "4. Composicion\n";
 
 	int choice;
-	float identidad[MATRIZ_SIZE] = {
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1 };
+	float matrizT[MATRIZ_SIZE] = { 0 };  // matriz de la transformación
+	generatriz.Indentidad(matrizT);
 	std::cin >> choice;
 
 	switch (choice) {
 	case 1:
-		trasladarCubo(cubo,matriz);
+		if (traslacion(matrizT) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
 	case 2:
-		rotarCubo(cubo, matriz);
+		if (rotacion(matrizT, generatriz) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
 	case 3:
-		escalarCubo(cubo, matriz);
+		if (escala(matrizT) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
 	case 4:
-		componerTransf(identidad);
+		if (componerTransf(matrizT, generatriz) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
 	default:
-		std::cout << "Opcion no válida. Intente nuevamente.\n";
+		std::cout << "Opcion no valida. Intente nuevamente.\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		return EXIT_FAILURE;
 	}
 	std::cout << "//////////////////////////////////////\n";
-	return 0;
+
+	// Aplicar transformación al cubo
+	TranformarVertices(matrizT, cubo);
+
+	return EXIT_SUCCESS;
 }
 
 int main() {
-	Matriz4x4 matriz;
+	Matriz4x4 generatriz;
 	CubeUI cube;
 
 	while (cube.deviceRun()) {
 		cube.render();
-		menu(cube, matriz);
+		menu(cube, generatriz);
 		std::cin.clear();
 	}
 	
-
-
 	return 0;
 }

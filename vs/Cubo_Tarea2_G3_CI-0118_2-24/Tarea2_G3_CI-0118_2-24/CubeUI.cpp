@@ -2,6 +2,7 @@
 
 CubeUI::CubeUI()
     : device(createDevice(video::EDT_OPENGL, core::dimension2d<u32>(800, 600), 16, false, false, false, 0))
+    , vertices{ 0 }
 {
     using namespace core;
     using namespace scene;
@@ -67,9 +68,6 @@ CubeUI::CubeUI()
     if (this->node) {
         this->node->setMaterialFlag(EMF_LIGHTING, false); // Desactivar iluminación
         this->node->setMaterialFlag(EMF_BACK_FACE_CULLING, false); // Mostrar ambas caras
-
-        // Rotar el cubo 45 grados en los ejes X, Y y Z
-        this->node->setRotation(vector3df(0, 45, 0));
     }
 
     // Agregar una cámara

@@ -113,7 +113,12 @@
       <AdditionalLibraryDirectories>$(SolutionDir)External/irrlicht-1.8.5\lib/Win64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Irrlicht.lib
 ;%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>
+      </LargeAddressAware>
     </Link>
+    <MASM>
+      <CallingConvention>1</CallingConvention>
+    </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -133,7 +138,12 @@
       <AdditionalLibraryDirectories>$(SolutionDir)External/irrlicht-1.8.5\lib/Win64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Irrlicht.lib
 ;%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>
+      </LargeAddressAware>
     </Link>
+    <MASM>
+      <CallingConvention>1</CallingConvention>
+    </MASM>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

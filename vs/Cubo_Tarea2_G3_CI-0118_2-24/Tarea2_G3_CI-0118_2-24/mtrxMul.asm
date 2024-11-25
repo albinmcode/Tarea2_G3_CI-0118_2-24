@@ -14,6 +14,7 @@
 
 .DATA
     resultado dd 0.0
+    matrixTemp dd 16 DUP(0)
 
 .CODE
 
@@ -66,7 +67,7 @@ mulMatrix4x4 PROC ; (float* matrixAptr, float* matrixBptr, float* matrixResPtr)
 
     mov RBX, RCX      ; RBX = Direcci?n de matA
     mov RSI, RDX      ; RSI = Direcci?n de matB
-    mov RDI, R8       ; RDI = Direcci?n de matResult
+    mov RDI, offset matrixTemp ; RDI apunta al b?fer temporal en .data
 
     xor R9, R9        ; Reiniciar a 0 R9 = fila actual de matA
     filaLoop:
@@ -93,20 +94,28 @@ mulMatrix4x4 PROC ; (float* matrixAptr, float* matrixBptr, float* matrixResPtr)
             vshufps xmm3, xmm2, xmm2, 1
             vaddps xmm2, xmm2, xmm3
 
-            ; Guardar el escalar en la posici?n correspondiente de matResult
-            mov RCX, R9
-            add RCX, R10
-            movss dword ptr [RDI + RCX], xmm2
+            ; Guardar el escalar en el b?fer temporal
+            mov RCX, R9 ; columna
+            add RCX, R10 ; fila + columna
+            movss dword ptr [RDI+RCX], xmm2
 
             ; Siguiente columna
-            add R10, 4    ; Desplazarse a la siguiente columna en matB
-            cmp R10, 16    ; 4 columnas * 16 bytes por columna
+            add R10, 4        ; Desplazarse a la siguiente columna en matB
+            cmp R10, 16       ; 4 columnas * 16 bytes por columna
             jl columnaLoop
 
         ; Siguiente fila
-        add R9, 16        ; Desplazarse a la siguiente fila en matA
-        cmp R9, 64        ; 4 filas * 16 bytes por fila
+        add R9, 16            ; Desplazarse a la siguiente fila en matA
+        cmp R9, 64            ; 4 filas * 16 bytes por fila
         jl filaLoop
+
+    ; Cargar los resultados en R8
+    ; primeras dos filas
+    vmovups ymm0, ymmword ptr matrixTemp
+    vmovups [R8], ymm0
+    ; tercera y cuarta fila
+    vmovups ymm1, ymmword ptr matrixTemp[32] 
+    vmovups [R8+32], ymm1
 
     pop RBX
     pop RDI
