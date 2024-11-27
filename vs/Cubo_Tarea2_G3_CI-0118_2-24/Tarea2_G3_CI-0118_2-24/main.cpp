@@ -153,34 +153,40 @@ int componerTransf(float* matrizComp, Matriz4x4& generatriz) {
 }
 
 int menu(CubeUI& cubo, Matriz4x4& generatriz) {
+	float matrizT[MATRIZ_SIZE] = { 0 };  // matriz de la transformación
+	generatriz.Indentidad(matrizT);
+	int choice;
 	std::cout << "\n//////////////////////////////////////\n"
 		<< "Seleccione una opcion:\n"
 		<< "1. Traslacion\n"
 		<< "2. Rotacion\n"
 		<< "3. Escala\n"
 		<< "4. Composicion\n";
-
-	int choice;
-	float matrizT[MATRIZ_SIZE] = { 0 };  // matriz de la transformación
-	generatriz.Indentidad(matrizT);
+	// Input
 	std::cin >> choice;
-
+	if (std::cin.fail()) {
+		std::cin.clear(); // Limpiar el estado de error de cin
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	}
 	switch (choice) {
+	// Traslación
 	case 1:
 		if (traslacion(matrizT) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
+	// Rotación
 	case 2:
 		if (rotacion(matrizT, generatriz) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
+	// Escala
 	case 3:
 		if (escala(matrizT) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
+	// Composición
 	case 4:
 		if (componerTransf(matrizT, generatriz) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
 	default:
 		std::cout << "Opcion no valida. Intente nuevamente.\n";
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		return EXIT_FAILURE;
 	}
 	std::cout << "//////////////////////////////////////\n";
@@ -198,7 +204,6 @@ int main() {
 	while (cube.deviceRun()) {
 		cube.render();
 		menu(cube, generatriz);
-		std::cin.clear();
 	}
 	
 	return 0;
