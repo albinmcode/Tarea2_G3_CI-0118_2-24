@@ -97,7 +97,7 @@ CubeUI::~CubeUI() {
     }
 }
 
-float* CubeUI::getVertices() {
+float* CubeUI::getVertices() { // puntero modificable
     return this->vertices;
 }
 
@@ -126,7 +126,7 @@ void CubeUI::refreshBuffer() {
 }
 
 void CubeUI::render() {
-    // actualizar coordenadas
+    // Actualizar coordenadas
     this->refreshBuffer();
     // Render
     driver->beginScene(true, true, video::SColor(255, 100, 101, 140));

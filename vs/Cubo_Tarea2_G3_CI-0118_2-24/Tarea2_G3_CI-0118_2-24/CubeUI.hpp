@@ -9,7 +9,7 @@ using namespace irr;
 
 class CubeUI {
  public:
-	//default constructor and destructor
+	//Constructor y destructor
 	CubeUI();
 	DISABLE_COPY(CubeUI);
 	~CubeUI();
@@ -34,7 +34,7 @@ class CubeUI {
 	 // Vertices array
 	 float vertices[CUBE_VERTICES_ARRAY];
 	 // Colores de las caras
-		video::SColor colores[6] = {
+     video::SColor colores[6] = {
 		video::SColor(255, 255, 0, 0),    // Rojo
 		video::SColor(255, 255, 255, 0),  // Amarillo
 		video::SColor(255, 0, 255, 0),    // Verde

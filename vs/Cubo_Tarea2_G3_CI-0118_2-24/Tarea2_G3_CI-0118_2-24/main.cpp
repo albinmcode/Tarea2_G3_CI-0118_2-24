@@ -5,6 +5,8 @@
 #include "CubeUI.hpp"
 
 /**
+* Tarea 2, grupo 3, Lenguaje Ensamblador, 2-24
+* 
 * | 1 0 0 0 |   |x|
 * | 0 1 0 0 | * |y|
 * | 0 0 1 0 |   |z|
@@ -158,9 +160,9 @@ int menu(CubeUI& cubo, Matriz4x4& generatriz) {
 	int choice;
 	std::cout << "\n//////////////////////////////////////\n"
 		<< "Seleccione una opcion:\n"
-		<< "1. Traslacion\n"
+		<< "1. Escala\n"
 		<< "2. Rotacion\n"
-		<< "3. Escala\n"
+		<< "3. Traslacion\n"
 		<< "4. Composicion\n";
 	// Input
 	std::cin >> choice;
@@ -169,17 +171,18 @@ int menu(CubeUI& cubo, Matriz4x4& generatriz) {
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
 	switch (choice) {
-	// Traslación
+	// Escala
 	case 1:
-		if (traslacion(matrizT) == EXIT_FAILURE) return EXIT_FAILURE;
+		if (escala(matrizT) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
 	// Rotación
 	case 2:
 		if (rotacion(matrizT, generatriz) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
-	// Escala
+	
+	// Traslación
 	case 3:
-		if (escala(matrizT) == EXIT_FAILURE) return EXIT_FAILURE;
+		if (traslacion(matrizT) == EXIT_FAILURE) return EXIT_FAILURE;
 		break;
 	// Composición
 	case 4:
